@@ -1,0 +1,25 @@
+# Container Scanning template
+# This template scans the container images for vulnerabilities.
+
+container_scanning:
+  stage: scan
+  image: docker:20.10.20
+  services:
+    - name: docker:20.10.20-dind
+      command: ["--host=unix:///var/run/docker.sock"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+    CONTAINER_SCANNING_IMAGE: quay.io/projectquay/clair:latest
+  script:
+    - echo "Starting container scanning..."
+    - docker pull $CI_REGISTRY_IMAGE
+    - |
+      docker run --rm \
+        --env DOCKER_IMAGE=$CI_REGISTRY_IMAGE \
+        --env DOCKER_HOST=$DOCKER_HOST \
+        --env DOCKER_DRIVER=$DOCKER_DRIVER \
+        $CONTAINER_SCANNING_IMAGE
+  artifacts:
+    reports:
+      container_scanning: flask-container-scanning-report.json

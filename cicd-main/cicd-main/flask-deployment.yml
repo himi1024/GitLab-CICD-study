@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-deployment
+spec:
+  replicas: 1  # Adjust the number of replicas as needed
+  selector:
+    matchLabels:
+      app: flask
+  template:
+    metadata:
+      labels:
+        app: flask
+    spec:
+      imagePullSecrets:
+      - name: regcred
+      containers:
+      - name: flask-pod
+        image: registry.gitlab.hk/himi/cicd:latest  # Replace with your image name and tag
+        ports:
+        - containerPort: 8888
+          protocol: TCP
