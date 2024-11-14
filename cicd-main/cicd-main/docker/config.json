@@ -1,0 +1,9 @@
+{
+    "auths": {
+      "registry.gitlab.hk": {
+        "username": "himichan",
+        "password": "$CI_REGISTRY_PASSWORD",
+        "email": "nightcore1024@gmail.com"
+      }
+    }
+  }
