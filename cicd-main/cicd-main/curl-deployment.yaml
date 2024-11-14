@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: curl-deployment
+  labels:
+    app: curl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: curl
+  template:
+    metadata:
+      labels:
+        app: curl
+    spec:
+      containers:
+      - name: curl-container
+        image: curlimages/curl:latest
+        command: ["/bin/sh", "-c", "while true; do sleep 10; curl -X POST http://flask-cluster-service:8888/api/hello -H 'Content-Type: application/json' -d '{\"message\": \"hello\"}'; done"]
+        livenessProbe:
+          exec:
+            command: ["curl", "-f", "http://flask-cluster-service:8888/"]
+          initialDelaySeconds: 5
+          timeoutSeconds: 5  # Increased timeout
+          periodSeconds: 10
+          failureThreshold: 3
+        securityContext:
+          runAsUser: 0  # Runs the container as the root user
