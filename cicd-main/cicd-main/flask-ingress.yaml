@@ -1,0 +1,18 @@
+# for NodePort usage
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flask-ingress
+spec:
+  ingressClassName: flask
+  rules:
+  - host: flask-ingress.example  # Update this with your desired host
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: flask-deployment
+            port:
+              number: 8888
