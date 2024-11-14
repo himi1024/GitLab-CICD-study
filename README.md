@@ -2,20 +2,20 @@
 
 # .gitlab-ci.yml
 stages:   
-#  - sast       # List of stages for jobs, and their order of execution
-#  - build
+  - sast       # List of stages for jobs, and their order of execution
+  - build
   - test
-#  - deploy
-#  - verify
-#  - custom-dast
+  - deploy
+  - verify
+  - custom-dast
   
-.semgrep-sast:
+semgrep-sast:
   stage: sast
   variables:
     SAST_ANALYZER_IMAGE_TAG: "3.7"
     SAST_IMAGE_SUFFIX: '-fips'
 
-.build_image:
+build_image:
   image: docker:20.10.20
   stage: build
   services:
@@ -27,11 +27,11 @@ stages:
     - docker build -t $CI_REGISTRY_IMAGE .
     - docker push $CI_REGISTRY_IMAGE
 
-.ontainer_scanning:
+ontainer_scanning:
   variables:
     CS_IMAGE: registry.gitlab.hk/himi/cicd:latest
 
-.deploy:
+deploy:
   image:
     name: bitnami/kubectl:latest
     entrypoint: ['']
@@ -66,7 +66,7 @@ test_api:
         exit 1;  # Exit with an error code to fail the job
       fi
   
-.resource_verify:
+resource_verify:
   stage: verify
   image:
     name: bitnami/kubectl:latest
@@ -79,7 +79,7 @@ test_api:
   variables:
     KUBE_CONTEXT: himi/cicd:gitlab-agent
 
-.function_verify:
+function_verify:
   stage: verify
   needs: [resource_verify]
   image:
@@ -91,14 +91,14 @@ test_api:
   variables:
     KUBE_CONTEXT: himi/cicd:gitlab-agent
 
-.dast:
+dast:
   stage: custom-dast
   image: bitnami/kubectl:latest  # Main image for the job
   services:
     - name: docker:20.10.20  # Additional service image
-  #rules:
-    #- if: '$CI_PIPELINE_SOURCE == "schedule"'
-    #- when: always  # Change for testing
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - when: always  # Change for testing
   script:
     - echo "Running DAST..."
     - kubectl config use-context himi/cicd:gitlab-agent
@@ -106,9 +106,7 @@ test_api:
 
 
 
-.include:
+include:
   - template: Jobs/SAST.gitlab-ci.yml
   - template: Jobs/Container-Scanning.gitlab-ci.yml
-#  - template: Jobs/DAST.gitlab-ci.yml
-
----
+  - template: Jobs/DAST.gitlab-ci.yml
