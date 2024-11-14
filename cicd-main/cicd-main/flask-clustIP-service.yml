@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-cluster-service
+  labels:
+    app: flask
+spec:
+  type: ClusterIP  # This specifies that it's a ClusterIP service
+  selector:
+    app: flask  # This should match the labels in your Flask deployment
+  ports:
+    - port: 8888           # The port that the service will expose
+      targetPort: 8888     # The port on the pod that should receive traffic                                                                                    
